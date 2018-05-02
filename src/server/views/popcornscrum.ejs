@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>PopcornScrum</title>
+    <% if (env === 'production') { %>
+    <link rel="stylesheet" href="/static/app.min.css">
+    <% } else { %>
+    <link rel="stylesheet" href="/static/app.css">
+    <% } %>
+</head>
+<body class="popcorn">
+<div class="popcornApp">
+    <!-- Start services Area -->
+    <section class="pb-100">
+        <div class="container">
+            <h1>Refresh the page to shuffle the list. <span id="cards" v-text="totalCards"></span></h1>
+            <h3>Click a name to remove it!</h3>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div id="timer-container" class="filler-container">
+                        <div  class="container-fill">
+                            <div id="timer" class="float-left font-size">
+                                0
+                            </div>
+                            <div class="float-right">
+                                <button id="stop-timer" class="btn btn-danger">Stop</button>
+                            </div>
+                            <div class="float-right">
+                                <button id="start-timer" class="btn btn-primary">Start</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-for="card in filteredCards">
+                <div class="row" v-on:click="removeThis(card)" v-bind:class="{complete: card.completed}">
+                    <div class="col-lg-12">
+                        <div class="filler-container selectable user-card">
+                            <div class="font-size">{{card.title}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
