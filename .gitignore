@@ -1,7 +1,7 @@
 .DS_Store
 
 # Webroot populated by Grunt
-public
+# public
 
 # Logs / Code Coverage
 logs
