@@ -1,8 +1,8 @@
 'use strict'
 
 let l = (method, str) => {
-  if (!console || !console[method]) return;
-  console[method](`[popcorn-scrum++] ${str}`);
+    if (!console || !console[method]) return;
+    console[method](`[popcorn-scrum++] ${str}`);
 };
 
 let log = (str) => l('log', str);

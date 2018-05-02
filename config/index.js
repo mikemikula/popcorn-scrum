@@ -16,15 +16,14 @@ config.port = process.env.PORT || 3000;
 // environments
 config.databaseUrl = 'postgres://localhost:5432/cards';
 config.databaseOptions = {
-  dialect: 'postgres',
-  logging: false,
-  pool: {
-    max: 5,
-    min: 0,
-    idle: 10000
-  }
+    dialect: 'postgres',
+    logging: false,
+    pool: {
+        max: 5,
+        min: 0,
+        idle: 10000
+    }
 };
-
 
 // ----------------------------------------------------
 // Assign values based on current execution environment
@@ -33,21 +32,26 @@ let environmentSettings = {};
 //process.env.NODE_ENV = 'production'; //FORCED TODO
 
 switch (process.env.NODE_ENV) {
-  case 'production': environmentSettings = require('./production'); break;
-  case 'test': environmentSettings = require('./test'); break;
-  default: environmentSettings = require('./development'); break;
+    case 'production':
+        environmentSettings = require('./production');
+        break;
+    case 'test':
+        environmentSettings = require('./test');
+        break;
+    default:
+        environmentSettings = require('./development');
+        break;
 }
 config = Object.assign(config, environmentSettings);
-
 
 // ---------------------------------------
 // Override with user settings, if present
 // ---------------------------------------
 try {
-  let userSettings = require('./user');
-  config = Object.assign(config, userSettings);
-} catch(e) {
-  // nbd if we don't have user settings
+    let userSettings = require('./user');
+    config = Object.assign(config, userSettings);
+} catch (e) {
+    // nbd if we don't have user settings
 }
 
 // Export final configuration object

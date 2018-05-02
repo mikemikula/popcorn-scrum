@@ -9,17 +9,17 @@ module.exports = function (grunt) {
     };
     
     grunt.registerTask(
-        'init_static',
-        'Initialize static asset directory with unprocessed assets',
-        function (environment) {
-            
-            let publicPath = path.resolve(__dirname, '..', '..', 'public');
-            let staticPath = path.resolve(__dirname, '..', '..', 'src', 'browser', 'static');
-            fs.removeSync(publicPath);
-            fs.mkdirSync(publicPath);
-            
-            fs.copySync(staticPath, publicPath);
-            log(`Static asset directory initialized at ${publicPath}`);
-        });
+            'init_static',
+            'Initialize static asset directory with unprocessed assets',
+            function (environment) {
+                
+                let publicPath = path.resolve(__dirname, '..', '..', 'public');
+                let staticPath = path.resolve(__dirname, '..', '..', 'src', 'browser', 'static');
+                fs.removeSync(publicPath);
+                fs.mkdirSync(publicPath);
+                
+                fs.copySync(staticPath, publicPath);
+                log(`Static asset directory initialized at ${publicPath}`);
+            });
     
 };

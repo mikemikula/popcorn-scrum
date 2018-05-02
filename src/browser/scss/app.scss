@@ -1,7 +1,7 @@
 @import "./scss/bootstrap";
 
 [v-cloak] {
-  display: none; 
+  display: none;
 }
 
 body.popcorn {
@@ -13,7 +13,7 @@ body.popcorn {
   }
 
   .container-fill {
-    width:100%;
+    width: 100%;
     height: 30px;
   }
 
@@ -26,15 +26,15 @@ body.popcorn {
 
     &:hover {
       background-color: #e6e6e6;
-      cursor:pointer;
+      cursor: pointer;
     }
 
     .complete {
-      background-color:#dc7f7f;
+      background-color: #dc7f7f;
     }
   }
 
   .btn {
-    margin:5px;
+    margin: 5px;
   }
 }

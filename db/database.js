@@ -6,7 +6,7 @@ const config = require('../config');
 // Configuration object for Sequelize migrations - we configure these separately
 // elsewhere based on the current NODE_ENV, because our app's config object is
 // not structured to have separate "production" or "test" properties
-let sequelizeConfig = { url: config.databaseUrl, dialect: 'postgres' };
+let sequelizeConfig = {url: config.databaseUrl, dialect: 'postgres'};
 sequelizeConfig.production = sequelizeConfig;
 sequelizeConfig.test = sequelizeConfig;
 sequelizeConfig.development = sequelizeConfig;
