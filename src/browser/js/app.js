@@ -1,6 +1,6 @@
 'use strict';
 
-const Vue = require('vue');
+const Vue = require('vue/dist/vue.js');
 //const appView = require('./views/todos');
 const cardAppView = require('./views/cards');
 const router = require('./util/routes');

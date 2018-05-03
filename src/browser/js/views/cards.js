@@ -1,4 +1,4 @@
-const Vue = require('vue');
+const Vue = require('vue/dist/vue.js');
 
 let filters = {
     all: function (cards) {
@@ -39,7 +39,10 @@ let app = {
             , {title: 'Lauren Gordon-Fahn', completed: false}
         ],
         visibility: 'all',
-        totalCards: ''
+        totalCards: '',
+        currentDate: '',
+        timer: '',
+        time: '0'
     },
     
     computed: {
@@ -49,10 +52,34 @@ let app = {
         }
     },
     
+    mounted: function (){
+        this.shuffleCards();
+    },
+    
     methods: {
         removeThis: function (card) {
             card.completed = true;
+        },
+        
+        updateTime: function() {
+            let d = new Date();
+            let changedDate = d - this.currentDate;
+            this.time = Math.floor(changedDate / 1000);
+        },
+        
+        startTimer: function () {
+            this.currentDate = new Date();
+            this.timer = setInterval(this.updateTime, 1000)
+        },
+        
+        stopTimer: function () {
+            clearInterval(this.timer);
+        },
+        
+        shuffleCards: function() {
+            this.cards = _.shuffle(this.cards);
         }
+        
     }
 };
 

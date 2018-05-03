@@ -1,6 +1,6 @@
 'use strict';
 
-const Vue = require('vue');
+const Vue = require('vue/dist/vue.js');
 const todoStorage = require('../util/store');
 let socket = io();
 

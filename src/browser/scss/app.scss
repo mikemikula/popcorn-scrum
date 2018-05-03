@@ -28,9 +28,11 @@ body.popcorn {
       background-color: #e6e6e6;
       cursor: pointer;
     }
+  }
 
-    .complete {
-      background-color: #dc7f7f;
+  .row {
+    &.complete {
+      display:none;
     }
   }
 
