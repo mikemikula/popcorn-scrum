@@ -59,6 +59,7 @@ let app = {
     methods: {
         removeThis: function (card) {
             card.completed = true;
+            this.stopTimer();
         },
         
         updateTime: function() {
@@ -74,6 +75,7 @@ let app = {
         
         stopTimer: function () {
             clearInterval(this.timer);
+            this.time = '0';
         },
         
         shuffleCards: function() {
