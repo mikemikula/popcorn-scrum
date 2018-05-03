@@ -65,7 +65,7 @@ let app = {
         updateTime: function() {
             let d = new Date();
             let changedDate = d - this.currentDate;
-            this.time = Math.floor(changedDate / 1000);
+            this.time = Math.floor(changedDate / 1000).toString();
         },
         
         startTimer: function () {
