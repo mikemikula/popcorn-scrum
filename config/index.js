@@ -36,7 +36,7 @@ config.pool = {
 // Assign values based on current execution environment
 // ----------------------------------------------------
 let environmentSettings = {};
-//process.env.NODE_ENV = 'production'; //FORCED TODO
+process.env.NODE_ENV = 'production'; //FORCED TODO
 
 switch (process.env.NODE_ENV) {
     case 'production':
