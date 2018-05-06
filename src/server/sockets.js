@@ -7,7 +7,7 @@ exports.init = function (_io) {
     io = _io;
 };
 
-exports.todoAdded = function (todo) {
-    io.emit('todoAdded', todo);
+exports.cardAdded = function (card) {
+    io.emit('cardAdded', card);
 };
 

@@ -13,5 +13,14 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://pellefant.db.elephantsql.com:5432/fibamrth</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="d9ljogm9150m07@ec2-54-225-200-15.compute-1.amazonaws.com" uuid="c271de41-41da-430f-865c-6ed2f6d82f4d">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://ec2-54-225-200-15.compute-1.amazonaws.com:5432/d9ljogm9150m07?sslmode=require</jdbc-url>
+      <driver-properties>
+        <property name="ssl" value="true" />
+      </driver-properties>
+    </data-source>
   </component>
 </project>

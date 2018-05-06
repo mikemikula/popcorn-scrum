@@ -1,4 +1,6 @@
 const Vue = require('vue/dist/vue.js');
+const cardsDb = require('../util/cardsDb');
+let socket = io();
 
 let filters = {
     all: function (cards) {
@@ -16,6 +18,20 @@ let filters = {
     }
 };
 
+// {title: 'Mike Mikula', completed: false}
+// , {title: 'Kyle Kopps', completed: false}
+// , {title: 'JJ Cory', completed: false}
+// , {title: 'Bethany Sievert', completed: false}
+// , {title: 'Ryan Hood', completed: false}
+// , {title: 'Bryan Schiek', completed: false}
+// , {title: 'Tatianna Hansen', completed: false}
+// , {title: 'Maria Bellmann', completed: false}
+// , {title: 'Terry Beaulieu', completed: false}
+// , {title: 'Dave Hoover', completed: false}
+// , {title: 'Tom Sullivan', completed: false}
+// , {title: 'Nathan Wenslaff', completed: false}
+// , {title: 'Lauren Gordon-Fahn', completed: false}
+
 let app = {
     
     // the root element that will be compiled
@@ -23,26 +39,31 @@ let app = {
     
     // app initial state
     data: {
-        cards: [
-            {title: 'Mike Mikula', completed: false}
-            , {title: 'Kyle Kopps', completed: false}
-            , {title: 'JJ Cory', completed: false}
-            , {title: 'Bethany Sievert', completed: false}
-            , {title: 'Ryan Hood', completed: false}
-            , {title: 'Bryan Schiek', completed: false}
-            , {title: 'Tatianna Hansen', completed: false}
-            , {title: 'Maria Bellmann', completed: false}
-            , {title: 'Terry Beaulieu', completed: false}
-            , {title: 'Dave Hoover', completed: false}
-            , {title: 'Tom Sullivan', completed: false}
-            , {title: 'Nathan Wenslaff', completed: false}
-            , {title: 'Lauren Gordon-Fahn', completed: false}
-        ],
+        cards: [],
         visibility: 'all',
         totalCards: '',
         currentDate: '',
         timer: '',
         time: '0'
+    },
+    
+    created() {
+        this.socket = io();
+        let self = this;
+        this.socket.on('cardAdded', function (card) {
+            let found = false;
+            for (let t of self.cards) {
+                if (t.id == card.id) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) self.cards.push(card);
+        });
+        cardsDb.fetch((err, cards) => {
+            this.cards = cards;
+            console.log(cards);
+        });
     },
     
     computed: {
