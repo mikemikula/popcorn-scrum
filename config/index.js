@@ -14,8 +14,7 @@ config.port = process.env.PORT || 3000;
 
 // Options for Sequelize ORM connection - overrides in production and test
 // environments
-config.url = 'postgresql://kplxtedrscxosn:c08dec439d5adf7af2ca908813a4765b60031d29eda761a4795ca5bfaa1c9b0a' +
-        '@ec2-54-225-200-15.compute-1.amazonaws.com:5432/d9ljogm9150m07';
+config.url = 'postgresql://kplxtedrscxosn:c08dec439d5adf7af2ca908813a4765b60031d29eda761a4795ca5bfaa1c9b0a@ec2-54-225-200-15.compute-1.amazonaws.com:5432/d9ljogm9150m07';
 
 config.databaseUrl = config.url;
 
