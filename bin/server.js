@@ -1,12 +1,12 @@
 'use strict';
 
-const https = require('https');
+const http = require('http');
 const config = require('../config');
 const app = require('../src/server/webapp');
 const sockets = require('../src/server/sockets');
 const log = require('../src/shared/log');
 
-let server = https.createServer(app);
+let server = http.createServer(app);
 let io = require('socket.io')(server);
 sockets.init(io);
 
