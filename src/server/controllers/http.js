@@ -72,6 +72,7 @@ exports.shuffle_cards = (req, res) => {
         
         res.send();
         sockets.cardsRefresh(cards);
+        sockets.manageTimer(false);
     });
 };
 
