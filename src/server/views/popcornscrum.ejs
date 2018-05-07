@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>PopcornScrum</title>
+    <title>PopcornScrum v2.0</title>
     <% if (env === 'production') { %>
     <link rel="stylesheet" href="/static/app.min.css">
     <% } else { %>
@@ -14,8 +14,7 @@
     <!-- Start services Area -->
     <section class="pb-100">
         <div class="container">
-            <h1>Refresh the page to shuffle the list. <span id="cards" v-text="totalCards"></span></h1>
-            <h3>Click a name to remove it!</h3>
+            <h1>Timer</h1>
             <div class="row">
                 <div class="col-lg-12">
                     <div id="timer-container" class="filler-container">
@@ -36,12 +35,21 @@
                     </div>
                 </div>
             </div>
+            <h1>Scrum Deck<span id="cards" v-text="totalCardsText"></span></h1>
+            <h3>Click a name to remove it!</h3>
             <div v-for="card in filteredCards">
                 <div class="row" v-on:click="completeCard(card)" v-bind:class="{complete: card.completed}">
                     <div class="col-lg-12">
                         <div class="filler-container selectable user-card">
                             <div class="font-size">{{card.title}}</div>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" v-if="allCardsComplete">
+                <div class="col-lg-12">
+                    <div class="filler-container">
+                        <div>Press <button id="start-timer" class="btn btn-primary" v-on:click="shuffleCards()">shuffle</button> to play again!</div>
                     </div>
                 </div>
             </div>

@@ -27,10 +27,11 @@ let app = {
     data: {
         cards: [],
         visibility: 'all',
-        totalCards: '',
+        totalCardsText: '',
         currentDate: '',
         timer: '',
-        time: '0'
+        time: '0',
+        allCardsComplete: false
     },
     
     created() {
@@ -44,7 +45,17 @@ let app = {
     
     computed: {
         filteredCards: function () {
-            this.totalCards = '(' + (filters.completed(this.cards).length) + '/' + this.cards.length + ')';
+            let totalCards = this.cards.length;
+            let totalCardsComplete = filters.completed(this.cards).length;
+            
+            this.totalCardsText = '(' + totalCardsComplete + '/' + totalCards + ')';
+            
+            if(totalCards === totalCardsComplete){
+                this.allCardsComplete = true;
+            }
+            else {
+                this.allCardsComplete = false;
+            }
             return this.cards;
         }
     },
