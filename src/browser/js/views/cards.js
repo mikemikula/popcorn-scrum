@@ -38,6 +38,12 @@ let app = {
         this.socket = io();
         let self = this;
         this.socket.on('cardsRefresh', function (cards) {
+            for(let card of cards){
+                if(!card.completed){
+                    card.first = true;
+                    break;
+                }
+            }
             self.updateCards(cards);
         });
         this.socket.on('manageTimer', function (timerOn) {
@@ -74,7 +80,7 @@ let app = {
                 // this.cards = cards;
             });
             
-            this.stopTimer();
+            this.clickStartTimer();
         },
         
         updateTime: function() {
