@@ -40,7 +40,6 @@ exports.update_card = (req, res) => {
     Card.findById(req.params.id)
     .then((card) => {
         if (!card) return res.status(404);
-        card.selected = req.body.selected === 'true';
         card.completed = req.body.completed === 'true';
         card.title = req.body.title;
         card.save()
