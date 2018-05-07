@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div v-for="card in filteredCards">
-                <div class="row" v-on:click="removeThis(card)" v-bind:class="{complete: card.completed}">
+                <div class="row" v-on:click="completeCard(card)" v-bind:class="{complete: card.completed}">
                     <div class="col-lg-12">
                         <div class="filler-container selectable user-card">
                             <div class="font-size">{{card.title}}</div>

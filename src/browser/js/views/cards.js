@@ -18,20 +18,6 @@ let filters = {
     }
 };
 
-// {title: 'Mike Mikula', completed: false}
-// , {title: 'Kyle Kopps', completed: false}
-// , {title: 'JJ Cory', completed: false}
-// , {title: 'Bethany Sievert', completed: false}
-// , {title: 'Ryan Hood', completed: false}
-// , {title: 'Bryan Schiek', completed: false}
-// , {title: 'Tatianna Hansen', completed: false}
-// , {title: 'Maria Bellmann', completed: false}
-// , {title: 'Terry Beaulieu', completed: false}
-// , {title: 'Dave Hoover', completed: false}
-// , {title: 'Tom Sullivan', completed: false}
-// , {title: 'Nathan Wenslaff', completed: false}
-// , {title: 'Lauren Gordon-Fahn', completed: false}
-
 let app = {
     
     // the root element that will be compiled
@@ -50,36 +36,30 @@ let app = {
     created() {
         this.socket = io();
         let self = this;
-        this.socket.on('cardAdded', function (card) {
-            let found = false;
-            for (let t of self.cards) {
-                if (t.id == card.id) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) self.cards.push(card);
+        this.socket.on('cardsRefresh', function (cards) {
+            self.updateCards(cards);
         });
-        cardsDb.fetch((err, cards) => {
-            this.cards = cards;
-            console.log(cards);
-        });
+        cardsDb.fetch((err, cards) => {});
     },
     
     computed: {
         filteredCards: function () {
-            this.totalCards = '(' + (filters.completed(this.cards).length + 1) + '/' + this.cards.length + ')';
+            this.totalCards = '(' + (filters.completed(this.cards).length) + '/' + this.cards.length + ')';
             return this.cards;
         }
     },
     
-    mounted: function (){
-        this.shuffleCards();
-    },
-    
     methods: {
-        removeThis: function (card) {
+        updateCards: function(cards){
+            this.cards = cards;
+        },
+        
+        completeCard: function (card) {
             card.completed = true;
+            cardsDb.update(card,(err, cards) => {
+                // this.cards = cards;
+            });
+            
             this.stopTimer();
         },
         
@@ -100,9 +80,10 @@ let app = {
         },
         
         shuffleCards: function() {
-            this.cards = _.shuffle(this.cards);
+            cardsDb.shuffle((err, cards) => {
+                console.log(err + cards);
+            });
         }
-        
     }
 };
 

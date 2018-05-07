@@ -3,35 +3,88 @@ const Card = require('../models/card');
 const bodyParser = require('body-parser');
 
 // Render home page
-exports.popcornscrum = (request, response) => {
-    response.render('popcornscrum', {
+exports.popcornscrum = (req, res) => {
+    res.render('popcornscrum', {
         env: process.env.NODE_ENV
     });
 };
 
-exports.create_card = (request, response) => {
-    
+exports.create_card = (req, res) => {
     Card.create({
-        title: request.body.title,
+        title: req.body.title,
         createdAt: new Date(),
         updatedAt: new Date(),
         completed: false
     }).then((card) => {
-        response.send(card);
-        sockets.cardAdded(card);
+        res.send(card);
     }).catch((error) => {
-        response.status(500).send(error);
+        res.status(500).send(error);
         console.log(error);
     });
 };
 
-exports.get_cards = (request, response) => {
-    
-    Card.all()
+exports.get_cards = (req, res) => {
+    Card.all({order: [
+            ['sequence', 'ASC'],
+        ]})
     .then((cards) => {
-        response.send(cards);
+        res.send();
+        sockets.cardsRefresh(cards);
     }).catch((error) => {
-        response.status(500).send(error);
+        res.status(500).send(error);
         console.log(error);
+    });
+};
+
+exports.update_card = (req, res) => {
+    Card.findById(req.params.id)
+    .then((card) => {
+        if (!card) return res.status(404);
+        card.selected = req.body.selected === 'true';
+        card.completed = req.body.completed === 'true';
+        card.title = req.body.title;
+        card.save()
+        .then(() => {
+            Card.all({order: [
+                    ['sequence', 'ASC'],
+            ]})
+            .then((cards) => {
+                res.send();
+                sockets.cardsRefresh(cards);
+            });
+        });
+    })
+};
+
+exports.shuffle_cards = (req, res) => {
+
+    Card.all({order: [
+        ['sequence', 'ASC'],
+    ]})
+    .then((cards) => {
+    
+        cards = cards.sort(() => Math.random() - 0.5);
+        let i = 0;
+        for(let card of cards){
+            card.sequence = i++;
+            card.completed = false;
+            card.save();
+        }
+        
+        res.send();
+        sockets.cardsRefresh(cards);
+    });
+};
+
+exports.remove_card = (req, res) => {
+    Card.destroy({
+        where: {
+            id: req.params.id
+        }
+    }).then((card) => {
+        res.send();
+        sockets.cardsRefresh(card);
+    }).catch((error) => {
+        res.status(500).send(error);
     });
 };

@@ -7,7 +7,6 @@ exports.init = function (_io) {
     io = _io;
 };
 
-exports.cardAdded = function (card) {
-    io.emit('cardAdded', card);
+exports.cardsRefresh = function (card) {
+    io.emit('cardsRefresh', card);
 };
-

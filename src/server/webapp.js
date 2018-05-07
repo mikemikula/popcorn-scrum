@@ -15,8 +15,8 @@ app.set('x-powered-by', false);
 
 // Configure middleware
 app.use(morgan('combined'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use('/api/*', bodyParser.json());
+app.use('/api/*', bodyParser.urlencoded({extended: false}));
 
 // Static file serving happens everywhere but in production
 if (process.env.NODE_ENV !== 'production') {
