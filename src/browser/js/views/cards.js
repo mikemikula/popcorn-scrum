@@ -40,6 +40,13 @@ let app = {
         this.socket.on('cardsRefresh', function (cards) {
             self.updateCards(cards);
         });
+        this.socket.on('manageTimer', function (timerOn) {
+            if(timerOn) {
+                self.startTimer();
+            } else {
+                self.stopTimer();
+            }
+        });
         cardsDb.fetch((err, cards) => {});
     },
     
@@ -50,12 +57,8 @@ let app = {
             
             this.totalCardsText = '(' + totalCardsComplete + '/' + totalCards + ')';
             
-            if(totalCards === totalCardsComplete){
-                this.allCardsComplete = true;
-            }
-            else {
-                this.allCardsComplete = false;
-            }
+            this.allCardsComplete = (totalCards === totalCardsComplete);
+            
             return this.cards;
         }
     },
@@ -80,7 +83,20 @@ let app = {
             this.time = Math.floor(changedDate / 1000).toString();
         },
         
+        clickStartTimer: function() {
+            cardsDb.manageTimer(true,(err, cards) => {
+                // this.cards = cards;
+            });
+        },
+    
+        clickStopTimer: function() {
+            cardsDb.manageTimer(false,(err, cards) => {
+                // this.cards = cards;
+            });
+        },
+        
         startTimer: function () {
+            this.stopTimer();
             this.currentDate = new Date();
             this.timer = setInterval(this.updateTime, 1000)
         },

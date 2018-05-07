@@ -87,3 +87,8 @@ exports.remove_card = (req, res) => {
         res.status(500).send(error);
     });
 };
+
+exports.manage_timer = (req, res) => {
+    sockets.manageTimer(req.body.isTiming);
+    res.send();
+};

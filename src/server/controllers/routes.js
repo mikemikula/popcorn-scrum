@@ -8,6 +8,7 @@ module.exports = (app) => {
     app.put('/api/create', http.create_card);
     app.get('/api/get', http.get_cards);
     app.post('/api/update/:id', http.update_card);
+    app.post('/api/manageTimer', http.manage_timer);
     app.post('/api/shuffle', http.shuffle_cards);
     app.delete('/api/remove/:id', http.remove_card);
 };

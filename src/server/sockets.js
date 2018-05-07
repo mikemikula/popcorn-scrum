@@ -10,3 +10,8 @@ exports.init = function (_io) {
 exports.cardsRefresh = function (card) {
     io.emit('cardsRefresh', card);
 };
+
+exports.manageTimer = function (isTiming) {
+    io.emit('manageTimer', isTiming);
+};
+

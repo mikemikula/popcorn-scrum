@@ -36,5 +36,20 @@ module.exports = {
         .catch(e => {
             callback(e, null);
         })
+    },
+    
+    manageTimer(isTiming,callback){
+        axios.post('/api/manageTimer',
+            {
+                isTiming: isTiming
+            }
+        )
+        .then(response => {
+            // JSON responses are automatically parsed.
+            callback(null, response.data);
+        })
+        .catch(e => {
+            callback(e, null);
+        })
     }
 };
