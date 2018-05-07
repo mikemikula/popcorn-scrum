@@ -50,7 +50,7 @@ exports.update_card = (req, res) => {
             .then((cards) => {
                 res.send();
                 sockets.cardsRefresh(cards);
-                sockets.manageTimer(false);
+                sockets.manageTimer(true);
             });
         });
     })

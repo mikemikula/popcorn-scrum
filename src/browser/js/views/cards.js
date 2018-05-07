@@ -79,8 +79,6 @@ let app = {
             cardsDb.update(card,(err, cards) => {
                 // this.cards = cards;
             });
-            
-            this.clickStartTimer();
         },
         
         updateTime: function() {
