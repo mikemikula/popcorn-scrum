@@ -1,4 +1,5 @@
 'use strict';
+const newrelic = require('newrelic');
 const http = require('http');
 const config = require('../config');
 const app = require('../src/server/webapp');
