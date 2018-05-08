@@ -16,7 +16,7 @@ pids
 *.pid.lock
 
 # npm
-# node_modules
+node_modules
 .npm
 
 # EB Deployment artifacts 
