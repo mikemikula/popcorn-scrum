@@ -39,6 +39,12 @@ config.databaseOptions = {
 let environmentSettings = {};
 //process.env.NODE_ENV = 'production'; //FORCED TODO
 
+if(process.env.NODE_ENV !== 'production') {
+    process.env.NEW_RELIC_APP_NAME = 'popcorn-scrum-dev';
+    process.env.NEW_RELIC_LICENSE_KEY = '80893e334d2a5cd5b58c041dacd21e7d6e5e9c80';
+    process.env.NEW_RELIC_NO_CONFIG_FILE=true;
+}
+
 switch (process.env.NODE_ENV) {
     case 'production':
         environmentSettings = require('./production');
