@@ -1,6 +1,5 @@
 const sockets = require('../sockets');
 const Card = require('../models/card');
-const bodyParser = require('body-parser');
 
 // Render home page
 exports.popcornscrum = (req, res) => {
