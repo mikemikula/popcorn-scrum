@@ -461,7 +461,7 @@ const containerWidth = ref('1200px')
   color: var(--text-secondary);
 }
 
-/* Timer Section - Better Aligned */
+/* Timer Section - Centered */
 .timer-section {
   background: linear-gradient(145deg, var(--bg-secondary), var(--bg-tertiary));
   border-radius: var(--radius-xl);
@@ -469,6 +469,11 @@ const containerWidth = ref('1200px')
   margin-bottom: var(--spacing-8);
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .timer {
@@ -481,19 +486,27 @@ const containerWidth = ref('1200px')
   text-shadow: var(--shadow-glow);
   margin-bottom: var(--spacing-6);
   letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px; /* Add fixed height to prevent jumping */
+  width: 100%;
 }
 
 .timer-running {
   animation: pulse 2s infinite;
 }
 
-/* Button Group Improvements */
+/* Button Group - Centered */
 .timer-controls {
   display: flex;
   gap: var(--spacing-3);
   justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
   padding: 0 var(--spacing-4);
+  width: 100%;
+  max-width: 600px; /* Limit width for better layout */
 }
 
 .btn {
@@ -681,12 +694,13 @@ const containerWidth = ref('1200px')
   }
 
   .timer {
+    min-height: 100px; /* Smaller height for mobile */
     font-size: clamp(2.5rem, 6vw, 3.5rem);
   }
 
   .timer-controls {
     flex-direction: column;
-    gap: var(--spacing-3);
+    width: 100%;
   }
 
   .btn {
