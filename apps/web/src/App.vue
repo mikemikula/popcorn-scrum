@@ -191,335 +191,472 @@ onBeforeUnmount(() => {
     isMobile.value = window.innerWidth < 768
   })
 })
+
+// Add theme customization
+const themes = {
+  dark: {
+    name: 'dark',
+    icon: '🌙'
+  },
+  light: {
+    name: 'light',
+    icon: '☀️'
+  }
+}
+
+const currentTheme = ref(themes.dark)
+
+const toggleTheme = () => {
+  currentTheme.value = currentTheme.value === themes.dark ? themes.light : themes.dark
+}
+
+// Add container width control
+const containerWidth = ref('1200px')
 </script>
 
 <template>
-  <div class="app-container" :class="theme">
-    <header class="app-header">
-      <h1 class="app-title">Popcorn Scrum</h1>
+  <div class="app-container" :class="currentTheme.name">
+    <!-- Header Section -->
+    <header class="app-header glass">
+      <div class="container">
+        <div class="header-content">
+          <h1 class="app-title text-gradient">
+            <span class="app-icon">🍿</span>
+            Popcorn Scrum
+          </h1>
+          <p class="app-subtitle">Make your daily standups fun and efficient</p>
+          <button 
+            class="theme-toggle" 
+            @click="toggleTheme"
+            :aria-label="`Switch to ${currentTheme === themes.dark ? 'light' : 'dark'} theme`"
+          >
+            {{ currentTheme.icon }}
+          </button>
+        </div>
+      </div>
     </header>
     
-    <div class="popcornApp">
-      <div class="scrum-questions">
-        <div class="question">What did you do yesterday?</div>
-        <div class="question">What are you working on today?</div>
-        <div class="question">Any blockers?</div>
-      </div>
-
-      <!-- Active Card Section -->
-      <div class="active-card-section">
-        <h2>Current Speaker <span class="card-count">{{ totalCardsText }}</span></h2>
-        <div class="active-card-container">
-          <div 
-            v-if="activeCard"
-            class="card-wrapper active"
-          >
-            <div class="card-content">
-              <div class="card-title">{{ activeCard.title }}</div>
-            </div>
-          </div>
-          <div v-else class="no-active-card">
-            All team members have spoken
-          </div>
-        </div>
-      </div>
-
-      <div class="timer-container">
-        <div class="timer">{{ time }}</div>
-        <div class="timer-controls">
-          <button 
-            class="btn" 
-            :class="[
-              isRunning ? 'btn-danger' : 'btn-primary',
-              { 'btn-disabled': allCompleted }
-            ]"
-            @click="isRunning ? clickStopTimer() : clickStartTimer()"
-            :disabled="allCompleted"
-          >
-            {{ isRunning ? 'Stop Timer' : 'Start Timer' }}
-          </button>
-          <button 
-            class="btn btn-secondary" 
-            @click="shuffleCards"
-            :disabled="allCompleted"
-            :class="{ 'btn-disabled': allCompleted }"
-          >
-            Next Speaker
-          </button>
-          <button class="btn btn-warning" @click="resetAll">
-            Reset All
-          </button>
-        </div>
-      </div>
-      
-      <!-- Completed Cards Section -->
-      <div class="completed-cards-section" v-if="completedCards.length > 0">
-        <h3>Completed Updates</h3>
-        <div class="cards-grid">
-          <div 
-            v-for="card in completedCards" 
-            :key="card.id"
-            class="card-wrapper completed"
-          >
-            <div class="card-content">
-              <div class="card-title">{{ card.title }}</div>
+    <main class="popcornApp">
+      <div class="container">
+        <!-- Progress Bar -->
+        <div class="progress-wrapper glass">
+          <div class="progress-container">
+            <div 
+              class="progress-bar" 
+              :style="{ width: `${(completedCards.length / filteredCards.length) * 100}%` }"
+              :aria-valuenow="completedCards.length"
+              :aria-valuemin="0"
+              :aria-valuemax="filteredCards.length"
+            >
+              <span class="progress-text">
+                {{ completedCards.length }}/{{ filteredCards.length }} Updates
+              </span>
             </div>
           </div>
         </div>
+
+        <!-- Timer Section -->
+        <section class="timer-section glass" aria-label="Timer Controls">
+          <div 
+            class="timer" 
+            :class="{ 'timer-running': isRunning }"
+            role="timer"
+            aria-label="Standup Timer"
+          >
+            {{ time }}
+          </div>
+          <div class="timer-controls" role="group" aria-label="Timer Controls">
+            <button 
+              class="btn" 
+              :class="[
+                isRunning ? 'btn-danger pulse' : 'btn-primary',
+                { 'btn-disabled': allCompleted }
+              ]"
+              @click="isRunning ? clickStopTimer() : clickStartTimer()"
+              :disabled="allCompleted"
+            >
+              <span class="btn-icon" aria-hidden="true">
+                {{ isRunning ? '⏹' : '▶' }}
+              </span>
+              <span class="btn-text">{{ isRunning ? 'Stop Timer' : 'Start Timer' }}</span>
+            </button>
+            <button 
+              class="btn btn-secondary" 
+              @click="shuffleCards"
+              :disabled="allCompleted"
+              :class="{ 'btn-disabled': allCompleted }"
+            >
+              <span class="btn-icon" aria-hidden="true">⏭</span>
+              <span class="btn-text">Next Speaker</span>
+            </button>
+            <button 
+              class="btn btn-warning" 
+              @click="resetAll"
+            >
+              <span class="btn-icon" aria-hidden="true">🔄</span>
+              <span class="btn-text">Reset All</span>
+            </button>
+          </div>
+        </section>
+
+        <div class="content-grid">
+          <!-- Scrum Questions Section -->
+          <section class="scrum-questions" aria-label="Scrum Questions">
+            <div class="question-card glass" v-for="(question, index) in [
+              'What did you do yesterday?',
+              'What are you working on today?',
+              'Any blockers?'
+            ]" :key="index">
+              <span class="question-number">{{ index + 1 }}</span>
+              <div class="question">{{ question }}</div>
+            </div>
+          </section>
+
+          <!-- Active Card Section -->
+          <section 
+            class="active-card-section glass" 
+            :class="{ 'all-done': allCompleted }"
+            aria-live="polite"
+          >
+            <h2 class="section-title">
+              Current Speaker
+              <div class="card-count-wrapper">
+                <span class="card-count" role="status">{{ totalCardsText }}</span>
+              </div>
+            </h2>
+            <div class="active-card-container">
+              <transition name="card-fade">
+                <div 
+                  v-if="activeCard" 
+                  class="card-wrapper active"
+                  @click="completeCard(activeCard)"
+                  role="button"
+                  tabindex="0"
+                >
+                  <div class="card-content">
+                    <div class="card-title">{{ activeCard.title }}</div>
+                    <div class="card-action">Click to mark as done</div>
+                  </div>
+                </div>
+                <div v-else class="no-active-card">
+                  <span class="celebration" role="img" aria-label="celebration">🎉</span>
+                  <div class="message">All team members have spoken!</div>
+                  <div class="sub-message">Click Reset All to start a new round</div>
+                </div>
+              </transition>
+            </div>
+          </section>
+        </div>
+        
+        <!-- Completed Cards Section -->
+        <section 
+          v-if="completedCards.length > 0" 
+          class="completed-cards-section"
+          aria-label="Completed Updates"
+        >
+          <transition name="fade">
+            <div>
+              <h3 class="section-title">
+                <span class="section-icon" aria-hidden="true">✅</span>
+                Completed Updates
+              </h3>
+              <div class="cards-grid">
+                <transition-group name="card-list">
+                  <div 
+                    v-for="card in completedCards" 
+                    :key="card.id"
+                    class="card-wrapper completed glass"
+                    role="listitem"
+                  >
+                    <div class="card-content">
+                      <div class="card-title">{{ card.title }}</div>
+                      <div class="completion-time">
+                        {{ new Date(card.updatedAt).toLocaleTimeString() }}
+                      </div>
+                    </div>
+                  </div>
+                </transition-group>
+              </div>
+            </div>
+          </transition>
+        </section>
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
-<style>
-:root {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2d2d2d;
-  --text-primary: #ffffff;
-  --text-secondary: #b3b3b3;
-  --accent-primary: #646cff;
-  --accent-secondary: #535bf2;
-  --danger: #ff4444;
-  --warning: #ffbb33;
-  --success: #00C851;
-  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --transition-speed: 0.3s;
+<style scoped>
+/* Layout & Container Styles */
+.container {
+  width: 100%;
+  max-width: v-bind(containerWidth);
+  margin: 0 auto;
+  padding: var(--spacing-4) var(--spacing-6);
 }
 
-body {
-  margin: 0;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: system-ui, -apple-system, sans-serif;
+@media (min-width: 768px) {
+  .container {
+    padding: var(--spacing-6) var(--spacing-8);
+  }
 }
 
-.app-container {
-  min-height: 100vh;
-  padding: 2rem;
+@media (min-width: 1024px) {
+  .container {
+    padding: var(--spacing-8) var(--spacing-12);
+  }
 }
 
-.timer-container {
+/* Header Styles */
+.app-header {
+  padding: var(--spacing-12) 0;
+  margin-bottom: var(--spacing-12);
+  background: linear-gradient(
+    to bottom,
+    var(--bg-secondary),
+    rgba(30, 41, 59, 0.8)
+  );
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.app-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at top right,
+    rgba(99, 102, 241, 0.1),
+    transparent 50%
+  );
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
   text-align: center;
-  margin-bottom: 3rem;
-}
-
-.timer {
-  font-size: 4rem;
-  font-weight: bold;
-  color: var(--accent-primary);
-  text-shadow: 0 0 10px rgba(100, 108, 255, 0.3);
-  margin-bottom: 1.5rem;
-}
-
-.btn {
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-speed);
-  margin: 0 0.5rem;
-}
-
-.btn-primary {
-  background: var(--accent-primary);
-  color: white;
-}
-
-.btn-danger {
-  background: var(--danger);
-  color: white;
-}
-
-.btn-secondary {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
-
-.cards-container {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
-.header {
+.app-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: var(--spacing-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-4);
+}
+
+.app-subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  opacity: 0.8;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Progress Bar Styles */
+.progress-wrapper {
+  padding: var(--spacing-6);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--spacing-8);
+  background: linear-gradient(
+    to right,
+    rgba(99, 102, 241, 0.05),
+    rgba(139, 92, 246, 0.05)
+  );
+}
+
+.progress-container {
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--primary-gradient);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Timer Section Styles */
+.timer-section {
+  padding: var(--spacing-12);
+  margin: var(--spacing-12) 0;
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.1),
+    rgba(139, 92, 246, 0.1)
+  );
+  box-shadow: var(--shadow-lg);
+}
+
+.timer {
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 800;
+  margin-bottom: var(--spacing-8);
   text-align: center;
-  margin-bottom: 2rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
 }
 
-.card-count {
-  color: var(--text-secondary);
-  font-size: 1rem;
+.timer-controls {
+  display: flex;
+  gap: var(--spacing-4);
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0 var(--spacing-4);
 }
 
+/* Question Cards Styles */
 .scrum-questions {
-  margin: 2rem auto;
-  padding: 1.5rem;
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  max-width: 800px;
-  text-align: center;
+  display: grid;
+  gap: var(--spacing-6);
+  margin: var(--spacing-12) 0;
 }
 
-.question {
+.question-card {
+  padding: var(--spacing-6);
+  border-radius: var(--radius-xl);
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  transition: transform 0.3s ease;
+}
+
+.question-card:hover {
+  transform: translateY(-2px);
+}
+
+.question-number {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-gradient);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+/* Active Card Section */
+.active-card-section {
+  padding: var(--spacing-8);
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.05),
+    rgba(139, 92, 246, 0.05)
+  );
+}
+
+.section-title {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-count-wrapper {
+  font-size: var(--font-size-base);
   color: var(--text-secondary);
-  margin: 0.75rem 0;
-  font-size: 1.1rem;
+  background: var(--bg-tertiary);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-full);
+}
+
+/* Completed Cards Section */
+.completed-cards-section {
+  margin-top: var(--spacing-12);
+  padding: var(--spacing-8);
+  border-radius: var(--radius-2xl);
+  background: var(--bg-secondary);
 }
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  gap: var(--spacing-6);
+  margin-top: var(--spacing-6);
 }
 
-.card-wrapper {
-  position: relative;
-  transition: all var(--transition-speed);
-}
-
-.card-content {
-  background: var(--bg-secondary);
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: var(--card-shadow);
-}
-
-.card-title {
-  font-size: 1.25rem;
-  font-weight: 500;
-}
-
-.active .card-content {
-  background: var(--accent-primary);
-  transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(100, 108, 255, 0.2);
-}
-
-.completed .card-content {
-  opacity: 0.7;
-  background: var(--bg-secondary);
-}
-
-.inactive .card-content {
-  opacity: 0.7;
-}
-
-.app-header {
-  text-align: center;
-  padding: 2rem 0;
-  background: var(--bg-secondary);
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.app-title {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: var(--accent-primary);
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  text-shadow: 0 0 10px rgba(100, 108, 255, 0.3);
-}
-
-.btn-warning {
-  background: var(--warning);
-  color: var(--bg-primary);
-  font-weight: bold;
-}
-
-.btn-warning:hover {
-  background: darken(var(--warning), 10%);
-  transform: translateY(-1px);
-}
-
-.active-card-section {
-  text-align: center;
-  margin: 2rem 0 3rem;
-  padding: 1rem;
-}
-
-.active-card-container {
-  max-width: 600px;
-  margin: 1rem auto;
-}
-
-.no-active-card {
-  padding: 2rem;
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
-.completed-cards-section {
-  margin-top: 3rem;
-  padding: 1rem;
-}
-
-.completed-cards-section h3 {
-  color: var(--text-secondary);
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.btn-disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-@media (max-width: 768px) {
-  .app-container {
-    padding: 1rem;
-  }
-
-  .timer {
-    font-size: 3rem;
-  }
-
+@media (min-width: 640px) {
   .cards-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
+}
 
-  .btn {
-    width: 100%;
-    margin: 0.5rem 0;
+@media (min-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
+}
 
-  .app-header {
-    padding: 1rem 0;
-  }
+/* Button Styles */
+.btn {
+  padding: var(--spacing-4) var(--spacing-8);
+  min-width: 160px;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  .app-title {
-    font-size: 2rem;
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .timer-section {
+    padding: var(--spacing-6);
   }
 
   .timer-controls {
-    display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--spacing-4);
   }
 
   .btn {
     width: 100%;
-    margin: 0;
+    min-width: unset;
   }
 
-  .active-card-section {
-    margin: 1rem 0 2rem;
+  .section-title {
+    flex-direction: column;
+    gap: var(--spacing-4);
+    text-align: center;
   }
+}
 
-  .scrum-questions {
-    margin: 1rem auto;
-    padding: 1rem;
-  }
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
 
-  .question {
-    font-size: 1rem;
+.app-icon {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .app-icon {
+    animation: none;
   }
 }
 </style> 
