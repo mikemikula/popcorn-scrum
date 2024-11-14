@@ -1,6 +1,4 @@
-
-https://github.com/user-attachments/assets/e59c7e18-8b87-48fc-89d8-cb804d6c6520
-Uploading popcorn-scrum.mov…
+https://github.com/user-attachments/assets/7fdb9d60-70e5-464a-b801-b0a3f3fcfeb2
 
 
 # Project Name
