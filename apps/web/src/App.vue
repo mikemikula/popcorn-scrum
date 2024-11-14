@@ -9,7 +9,7 @@ const time = ref('00:00')
 const totalCardsText = ref('')
 const filteredCards = ref<Card[]>([])
 const isRunning = ref(false)
-let timerInterval: NodeJS.Timer | null = null
+let timerInterval: ReturnType<typeof setInterval> | null = null
 let startTime: number | null = null
 const theme = ref('dark')
 const isMobile = ref(window.innerWidth < 768)
@@ -192,31 +192,13 @@ onBeforeUnmount(() => {
   })
 })
 
-// Add theme customization
-const themes = {
-  dark: {
-    name: 'dark',
-    icon: '🌙'
-  },
-  light: {
-    name: 'light',
-    icon: '☀️'
-  }
-}
-
-const currentTheme = ref(themes.dark)
-
-const toggleTheme = () => {
-  currentTheme.value = currentTheme.value === themes.dark ? themes.light : themes.dark
-}
-
 // Add container width control
 const containerWidth = ref('1200px')
 </script>
 
 <template>
-  <div class="app-container" :class="currentTheme.name">
-    <!-- Header Section -->
+  <div class="app-container">
+    <!-- Header Section with Integrated Progress Bar -->
     <header class="app-header glass">
       <div class="container">
         <div class="header-content">
@@ -225,36 +207,29 @@ const containerWidth = ref('1200px')
             Popcorn Scrum
           </h1>
           <p class="app-subtitle">Make your daily standups fun and efficient</p>
-          <button 
-            class="theme-toggle" 
-            @click="toggleTheme"
-            :aria-label="`Switch to ${currentTheme === themes.dark ? 'light' : 'dark'} theme`"
-          >
-            {{ currentTheme.icon }}
-          </button>
+          
+          <!-- Progress Bar integrated in header -->
+          <div class="progress-wrapper">
+            <div class="progress-container">
+              <div 
+                class="progress-bar" 
+                :style="{ width: `${(completedCards.length / filteredCards.length) * 100}%` }"
+                :aria-valuenow="completedCards.length"
+                :aria-valuemin="0"
+                :aria-valuemax="filteredCards.length"
+              >
+                <span class="progress-text">
+                  {{ completedCards.length }}/{{ filteredCards.length }} Updates
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </header>
     
     <main class="popcornApp">
       <div class="container">
-        <!-- Progress Bar -->
-        <div class="progress-wrapper glass">
-          <div class="progress-container">
-            <div 
-              class="progress-bar" 
-              :style="{ width: `${(completedCards.length / filteredCards.length) * 100}%` }"
-              :aria-valuenow="completedCards.length"
-              :aria-valuemin="0"
-              :aria-valuemax="filteredCards.length"
-            >
-              <span class="progress-text">
-                {{ completedCards.length }}/{{ filteredCards.length }} Updates
-              </span>
-            </div>
-          </div>
-        </div>
-
         <!-- Timer Section -->
         <section class="timer-section glass" aria-label="Timer Controls">
           <div 
@@ -396,7 +371,7 @@ const containerWidth = ref('1200px')
 
 /* Header Styles - More Compact */
 .app-header {
-  padding: var(--spacing-6) 0;
+  padding: var(--spacing-6) 0 var(--spacing-4);
   margin-bottom: var(--spacing-8);
   background: linear-gradient(
     to bottom,
@@ -404,6 +379,7 @@ const containerWidth = ref('1200px')
     rgba(30, 41, 59, 0.8)
   );
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
 }
 
 .header-content {
@@ -425,15 +401,13 @@ const containerWidth = ref('1200px')
 .app-subtitle {
   font-size: var(--font-size-base);
   opacity: 0.8;
+  margin-bottom: var(--spacing-6);
 }
 
-/* Progress Bar - More Compact */
+/* Progress Bar Styles */
 .progress-wrapper {
-  padding: var(--spacing-4);
-  border-radius: var(--radius-lg);
-  margin-bottom: var(--spacing-6);
-  background: var(--bg-secondary);
-  overflow: hidden;
+  padding: 0 var(--spacing-4);
+  margin-top: var(--spacing-4);
 }
 
 .progress-container {
@@ -450,12 +424,12 @@ const containerWidth = ref('1200px')
   top: 0;
   height: 100%;
   background: var(--primary-gradient);
-  transition: width 0.3s ease-in-out;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .progress-text {
   position: absolute;
-  right: var(--spacing-4);
+  right: 0;
   top: -1.5rem;
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
@@ -714,6 +688,19 @@ const containerWidth = ref('1200px')
 
   .section-title {
     font-size: var(--font-size-lg);
+  }
+
+  .app-header {
+    padding: var(--spacing-4) 0 var(--spacing-3);
+  }
+
+  .progress-wrapper {
+    padding: 0 var(--spacing-3);
+    margin-top: var(--spacing-3);
+  }
+
+  .progress-container {
+    height: 4px;
   }
 }
 
