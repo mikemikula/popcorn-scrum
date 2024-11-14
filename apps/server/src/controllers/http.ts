@@ -124,7 +124,6 @@ export const shuffle_cards = async (_req: Request, res: Response): Promise<void>
 
         res.send();
         sockets.cardsRefresh(processedCards);
-        sockets.manageTimer(false);
     } catch (error) {
         console.error(error);
         res.status(500).send(error);

@@ -82,33 +82,35 @@ const updateTimer = () => {
 
 const shuffleCards = async () => {
   try {
-    if (isRunning.value) {
+    if (!isRunning.value) {
+      await clickStartTimer();
+    } else {
       if (timerInterval) {
         clearInterval(timerInterval);
       }
       startTime = Date.now();
       timerInterval = setInterval(updateTimer, 1000);
+      time.value = '00:00';
     }
 
-    await axios.post('/api/shuffle')
-    await fetchCards()
+    await axios.post('/api/shuffle');
+    await fetchCards();
 
-    const allCompleted = filteredCards.value.every(card => card.completed)
+    const allCompleted = filteredCards.value.every(card => card.completed);
     if (allCompleted && isRunning.value) {
-      await clickStopTimer()
+      await clickStopTimer();
+      time.value = '00:00';
     }
-    
-    time.value = '00:00'
   } catch (error) {
-    console.error('Error shuffling cards:', error)
+    console.error('Error shuffling cards:', error);
   }
-}
+};
 
 const completeCard = async (card: Card) => {
   if (!card.isActive) return
   try {
     await axios.put(`/api/update/${card.id}`, {
-      completed: true,
+      completed: 'true',
       title: card.title
     })
     await fetchCards()
