@@ -2,6 +2,15 @@ import { Request, Response } from 'express';
 import * as sockets from '../sockets';
 import { CardModel } from '../models/card';
 
+// Helper function for better shuffling
+const shuffleArray = <T>(array: T[]): T[] => {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // swap elements
+    }
+    return array;
+};
+
 export const popcornscrum = (_req: Request, res: Response): void => {
     res.render('popcornscrum', {
         env: process.env.NODE_ENV
@@ -83,20 +92,29 @@ export const shuffle_cards = async (_req: Request, res: Response): Promise<void>
             await activeCard.save();
         }
 
-        // Then shuffle remaining cards
+        // Get all cards and shuffle only the uncompleted ones
         const cards = await CardModel.findAll({
             order: [['sequence', 'ASC']]
         });
 
-        const shuffled = [...cards].sort(() => Math.random() - 0.5);
+        // Separate completed and uncompleted cards
+        const completedCards = cards.filter(card => card.completed);
+        const uncompletedCards = cards.filter(card => !card.completed);
+
+        // Shuffle only the uncompleted cards
+        const shuffledUncompleted = shuffleArray([...uncompletedCards]);
+
+        // Combine back together with completed cards at the end
+        const finalOrder = [...shuffledUncompleted, ...completedCards];
         
-        await Promise.all(shuffled.map((card, index) => {
+        // Update sequences
+        await Promise.all(finalOrder.map((card, index) => {
             card.sequence = index;
             return card.save();
         }));
 
         // Process cards to mark new active card
-        const processedCards = shuffled.map((card, index, array) => {
+        const processedCards = finalOrder.map((card, index, array) => {
             const firstIncompleteIndex = array.findIndex(c => !c.completed);
             return {
                 ...card.toJSON(),
