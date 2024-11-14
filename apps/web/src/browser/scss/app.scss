@@ -1,0 +1,41 @@
+@import "./scss/bootstrap";
+
+// Add custom styles
+.popcorn {
+    background-color: #f8f9fa;
+}
+
+.popcornApp {
+    padding: 20px;
+}
+
+.filler-container {
+    margin: 10px 0;
+    padding: 15px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.font-size {
+    font-size: 1.25rem;
+}
+
+.complete {
+    opacity: 0.5;
+}
+
+.user-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+}
+
+.list-font {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
