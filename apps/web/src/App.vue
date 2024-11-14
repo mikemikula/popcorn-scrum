@@ -2,17 +2,69 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import axios from 'axios'
 import { io } from 'socket.io-client'
+import type { Socket } from 'socket.io-client'
 import type { Card } from '@popcorn/shared'
 
-const socket = io()
+// State
 const time = ref('00:00')
 const totalCardsText = ref('')
 const filteredCards = ref<Card[]>([])
 const isRunning = ref(false)
+const containerWidth = ref('1200px')
+const isMobile = ref(window.innerWidth < 768)
+
+// Socket connection
+const socket: Socket = io()
+
+// Timer state
 let timerInterval: ReturnType<typeof setInterval> | null = null
 let startTime: number | null = null
-const theme = ref('dark')
-const isMobile = ref(window.innerWidth < 768)
+
+// Timer functions
+const updateTimer = () => {
+  if (!startTime) return
+  const elapsed = Math.floor((Date.now() - startTime) / 1000)
+  const minutes = Math.floor(elapsed / 60)
+  const seconds = elapsed % 60
+  time.value = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+}
+
+const startTimer = () => {
+  if (!isRunning.value) {
+    isRunning.value = true
+    startTime = Date.now()
+    timerInterval = setInterval(updateTimer, 1000)
+  }
+}
+
+const stopTimer = () => {
+  if (isRunning.value) {
+    isRunning.value = false
+    if (timerInterval) {
+      clearInterval(timerInterval)
+      timerInterval = null
+    }
+  }
+}
+
+// API functions
+const clickStartTimer = async () => {
+  try {
+    await axios.post('/api/timer', { isTiming: true })
+    startTimer()
+  } catch (error) {
+    console.error('Error starting timer:', error)
+  }
+}
+
+const clickStopTimer = async () => {
+  try {
+    await axios.post('/api/timer', { isTiming: false })
+    stopTimer()
+  } catch (error) {
+    console.error('Error stopping timer:', error)
+  }
+}
 
 const fetchCards = async () => {
   try {
@@ -36,75 +88,31 @@ const updateTotalCards = () => {
   totalCardsText.value = ` (${remaining}/${total})`
 }
 
-const clickStartTimer = async () => {
-  try {
-    await axios.post('/api/timer', { isTiming: true })
-    startTimer()
-  } catch (error) {
-    console.error('Error starting timer:', error)
-  }
-}
-
-const clickStopTimer = async () => {
-  try {
-    await axios.post('/api/timer', { isTiming: false })
-    stopTimer()
-  } catch (error) {
-    console.error('Error stopping timer:', error)
-  }
-}
-
-const startTimer = () => {
-  if (!isRunning.value) {
-    isRunning.value = true
-    startTime = Date.now()
-    timerInterval = setInterval(updateTimer, 1000)
-  }
-}
-
-const stopTimer = () => {
-  if (isRunning.value) {
-    isRunning.value = false
-    if (timerInterval) {
-      clearInterval(timerInterval)
-      timerInterval = null
-    }
-  }
-}
-
-const updateTimer = () => {
-  if (!startTime) return
-  const elapsed = Math.floor((Date.now() - startTime) / 1000)
-  const minutes = Math.floor(elapsed / 60)
-  const seconds = elapsed % 60
-  time.value = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-}
-
 const shuffleCards = async () => {
   try {
     if (!isRunning.value) {
-      await clickStartTimer();
+      await clickStartTimer()
     } else {
       if (timerInterval) {
-        clearInterval(timerInterval);
+        clearInterval(timerInterval)
       }
-      startTime = Date.now();
-      timerInterval = setInterval(updateTimer, 1000);
-      time.value = '00:00';
+      startTime = Date.now()
+      timerInterval = setInterval(updateTimer, 1000)
+      time.value = '00:00'
     }
 
-    await axios.post('/api/shuffle');
-    await fetchCards();
+    await axios.post('/api/shuffle')
+    await fetchCards()
 
-    const allCompleted = filteredCards.value.every(card => card.completed);
+    const allCompleted = filteredCards.value.every(card => card.completed)
     if (allCompleted && isRunning.value) {
-      await clickStopTimer();
-      time.value = '00:00';
+      await clickStopTimer()
+      time.value = '00:00'
     }
   } catch (error) {
-    console.error('Error shuffling cards:', error);
+    console.error('Error shuffling cards:', error)
   }
-};
+}
 
 const completeCard = async (card: Card) => {
   if (!card.isActive) return
@@ -121,33 +129,30 @@ const completeCard = async (card: Card) => {
 
 const resetAll = async () => {
   try {
-    // Always stop and reset timer first
     if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
+      clearInterval(timerInterval)
+      timerInterval = null
     }
-    isRunning.value = false;
-    startTime = null;
-    time.value = '00:00';
+    isRunning.value = false
+    startTime = null
+    time.value = '00:00'
     
-    // Notify server that timer is stopped
-    await axios.post('/api/timer', { isTiming: false });
+    await axios.post('/api/timer', { isTiming: false })
     
-    // Reset all cards to uncompleted
     const promises = filteredCards.value.map(card => 
       axios.put(`/api/update/${card.id}`, {
         completed: false,
         title: card.title
       })
-    );
-    await Promise.all(promises);
-    await fetchCards();
+    )
+    await Promise.all(promises)
+    await fetchCards()
   } catch (error) {
-    console.error('Error resetting:', error);
+    console.error('Error resetting:', error)
   }
-};
+}
 
-// Add computed properties for active and completed cards
+// Computed properties
 const activeCard = computed(() => 
   filteredCards.value.find(card => card.isActive)
 )
@@ -156,11 +161,11 @@ const completedCards = computed(() =>
   filteredCards.value.filter(card => card.completed)
 )
 
-// Add computed property for all completed state
 const allCompleted = computed(() => 
   filteredCards.value.every(card => card.completed)
 )
 
+// Lifecycle hooks
 onMounted(() => {
   fetchCards()
   
@@ -193,9 +198,6 @@ onBeforeUnmount(() => {
     isMobile.value = window.innerWidth < 768
   })
 })
-
-// Add container width control
-const containerWidth = ref('1200px')
 </script>
 
 <template>
